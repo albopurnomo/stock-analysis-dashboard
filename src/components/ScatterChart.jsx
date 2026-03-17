@@ -30,8 +30,21 @@ const CustomTooltip = ({ active, payload }) => {
 
 const ScatterChart = ({ data }) => {
     return (
-        <div className="chart-container">
-            <ResponsiveContainer width="100%" height={500}>
+        <div className="chart-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+            {/* Top Quadrant Labels */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10% 0 5%' }}>
+                <div className="quadrant-box" style={{ width: '40%' }}>
+                    <div className="quadrant-title">Quadrant 3</div>
+                    <div className="quadrant-desc">Excellent Company + High Premium</div>
+                </div>
+                <div className="quadrant-box" style={{ width: '40%' }}>
+                    <div className="quadrant-title">Quadrant 1</div>
+                    <div className="quadrant-desc">Excellent Company + Attractive Price</div>
+                </div>
+            </div>
+
+            <div className="chart-container" style={{ position: 'relative' }}>
+                <ResponsiveContainer width="100%" height={500}>
                 <ReChartsScatterChart
                     margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
                 >
@@ -68,40 +81,25 @@ const ScatterChart = ({ data }) => {
                     <ZAxis type="number" range={[100, 100]} />
                     <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
                     
-                    {/* Quadrant Labels */}
-                    <foreignObject x="55%" y="4%" width="38%" height="60">
-                        <div className="quadrant-box" xmlns="http://www.w3.org/1999/xhtml">
-                            <div className="quadrant-title">Quadrant 1</div>
-                            <div className="quadrant-desc">Excellent Company + Attractive Price</div>
-                        </div>
-                    </foreignObject>
-                    
-                    <foreignObject x="55%" y="74%" width="38%" height="60">
-                        <div className="quadrant-box" xmlns="http://www.w3.org/1999/xhtml">
-                            <div className="quadrant-title">Quadrant 2</div>
-                            <div className="quadrant-desc">Good Company + Attractive Price</div>
-                        </div>
-                    </foreignObject>
-                    
-                    <foreignObject x="7%" y="4%" width="38%" height="60">
-                        <div className="quadrant-box" xmlns="http://www.w3.org/1999/xhtml">
-                            <div className="quadrant-title">Quadrant 3</div>
-                            <div className="quadrant-desc">Excellent Company + High Premium</div>
-                        </div>
-                    </foreignObject>
-                    
-                    <foreignObject x="7%" y="74%" width="38%" height="60">
-                        <div className="quadrant-box" xmlns="http://www.w3.org/1999/xhtml">
-                            <div className="quadrant-title">Quadrant 4</div>
-                            <div className="quadrant-desc">Good Company + High Premium</div>
-                        </div>
-                    </foreignObject>
-
                     <Scatter name="Stocks" data={data} fill="#38bdf8">
                         <LabelList dataKey="ticker" position="top" style={{ fill: '#fff', fontSize: '10px', fontWeight: 'bold' }} />
                     </Scatter>
                 </ReChartsScatterChart>
             </ResponsiveContainer>
+            </div>
+            
+            {/* Bottom Quadrant Labels */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10% 0 5%' }}>
+                <div className="quadrant-box" style={{ width: '40%' }}>
+                    <div className="quadrant-title">Quadrant 4</div>
+                    <div className="quadrant-desc">Good Company + High Premium</div>
+                </div>
+                <div className="quadrant-box" style={{ width: '40%' }}>
+                    <div className="quadrant-title">Quadrant 2</div>
+                    <div className="quadrant-desc">Good Company + Attractive Price</div>
+                </div>
+            </div>
+
         </div>
     );
 };
