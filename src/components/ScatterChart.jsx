@@ -69,17 +69,33 @@ const ScatterChart = ({ data }) => {
                     <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
                     
                     {/* Quadrant Labels */}
-                    <text x="75%" y="10%" fill="#ccc" fontSize="12" fontWeight="bold" textAnchor="middle">Kuadran 1</text>
-                    <text x="75%" y="13%" fill="#999" fontSize="10" textAnchor="middle">Excellent Company + Attractive Price</text>
+                    <foreignObject x="55%" y="4%" width="38%" height="60">
+                        <div className="quadrant-box" xmlns="http://www.w3.org/1999/xhtml">
+                            <div className="quadrant-title">Quadrant 1</div>
+                            <div className="quadrant-desc">Excellent Company + Attractive Price</div>
+                        </div>
+                    </foreignObject>
                     
-                    <text x="75%" y="87%" fill="#ccc" fontSize="12" fontWeight="bold" textAnchor="middle">Kuadran 2</text>
-                    <text x="75%" y="90%" fill="#999" fontSize="10" textAnchor="middle">Good Company + Attractive Price</text>
+                    <foreignObject x="55%" y="74%" width="38%" height="60">
+                        <div className="quadrant-box" xmlns="http://www.w3.org/1999/xhtml">
+                            <div className="quadrant-title">Quadrant 2</div>
+                            <div className="quadrant-desc">Good Company + Attractive Price</div>
+                        </div>
+                    </foreignObject>
                     
-                    <text x="25%" y="10%" fill="#ccc" fontSize="12" fontWeight="bold" textAnchor="middle">Kuadran 3</text>
-                    <text x="25%" y="13%" fill="#999" fontSize="10" textAnchor="middle">Excellent Company + High Premium</text>
+                    <foreignObject x="7%" y="4%" width="38%" height="60">
+                        <div className="quadrant-box" xmlns="http://www.w3.org/1999/xhtml">
+                            <div className="quadrant-title">Quadrant 3</div>
+                            <div className="quadrant-desc">Excellent Company + High Premium</div>
+                        </div>
+                    </foreignObject>
                     
-                    <text x="25%" y="87%" fill="#ccc" fontSize="12" fontWeight="bold" textAnchor="middle">Kuadran 4</text>
-                    <text x="25%" y="90%" fill="#999" fontSize="10" textAnchor="middle">Good Company + High Premium</text>
+                    <foreignObject x="7%" y="74%" width="38%" height="60">
+                        <div className="quadrant-box" xmlns="http://www.w3.org/1999/xhtml">
+                            <div className="quadrant-title">Quadrant 4</div>
+                            <div className="quadrant-desc">Good Company + High Premium</div>
+                        </div>
+                    </foreignObject>
 
                     <Scatter name="Stocks" data={data} fill="#38bdf8">
                         <LabelList dataKey="ticker" position="top" style={{ fill: '#fff', fontSize: '10px', fontWeight: 'bold' }} />
