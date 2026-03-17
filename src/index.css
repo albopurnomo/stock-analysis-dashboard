@@ -45,6 +45,7 @@ body {
     font-weight: 700;
     background: linear-gradient(to right, #38bdf8, #8b5cf6);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
 }
@@ -171,4 +172,34 @@ body {
     .dashboard-header h1 {
         font-size: 2rem;
     }
+}
+/* Quadrant Labels */
+.quadrant-box {
+    text-align: center;
+    background: rgba(15, 23, 42, 0.6);
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.quadrant-title {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.quadrant-desc {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
 }
