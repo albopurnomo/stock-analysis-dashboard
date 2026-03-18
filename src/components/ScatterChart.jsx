@@ -32,6 +32,29 @@ const CustomTooltip = ({ active, payload }) => {
 
 const ScatterChart = ({ data }) => {
     const [hoveredTicker, setHoveredTicker] = React.useState(null);
+    const hoverTimeoutRef = React.useRef(null);
+
+    const handleMouseEnter = (node) => {
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = null;
+        }
+        if (node && node.ticker) {
+            setHoveredTicker(node.ticker);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        // Clear any existing timeout
+        if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+        
+        // Set a small delay before clearing the hover state
+        // This prevents flickering when moving between dots
+        hoverTimeoutRef.current = setTimeout(() => {
+            setHoveredTicker(null);
+            hoverTimeoutRef.current = null;
+        }, 100);
+    };
 
     const renderCustomLabel = (props) => {
         const { x, y, value } = props;
@@ -119,9 +142,8 @@ const ScatterChart = ({ data }) => {
                         data={data} 
                         fill="#38bdf8"
                         style={{ cursor: 'pointer' }}
-                        onMouseEnter={(e) => {
-                            if (e && e.ticker) setHoveredTicker(e.ticker);
-                        }}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
                         isAnimationActive={false}
                     >
                         {data.map((entry, index) => {
