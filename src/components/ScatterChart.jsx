@@ -22,6 +22,7 @@ const CustomTooltip = ({ active, payload }) => {
                 <p className="desc">{data.businessModel}</p>
                 <p className="metric">Upside: {data.upside}%</p>
                 <p className="metric">Fundamental Score: {data.fundamentalScore}</p>
+                <p className="metric">Avg 5y DY: {data.dividendYield || 0}%</p>
             </div>
         );
     }
@@ -78,7 +79,14 @@ const ScatterChart = ({ data }) => {
                         domain={[5.5, 9]}
                         ticks={[5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9]}
                     />
-                    <ZAxis type="number" range={[100, 100]} />
+                    {/* ZAxis controls the dot size based on Dividend Yield */}
+                    <ZAxis 
+                        type="number" 
+                        dataKey="dividendYield" 
+                        range={[60, 600]} // Minimum size of 60 to ensure 0% DY is visible, max 600
+                        domain={[0, 25]} // Strict scale fixing 0 to min and 25 to max
+                        name="Avg 5y DY"
+                    />
                     <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
                     
                     <Scatter name="Stocks" data={data} fill="#38bdf8">

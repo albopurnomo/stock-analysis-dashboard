@@ -34,6 +34,7 @@ export const fetchStockData = async () => {
                         fundamentalScore: parseFloat(getCol(row, 'Fundamental Score') || '0'),
                         price: getCol(row, 'Harga'),
                         fairValue: getCol(row, 'Fair Value'),
+                        dividendYield: parseFloat((getCol(row, 'Avg 5y DY') || '0').replace('%', '').replace(',', '.')),
                     })).filter(item => item.ticker && !isNaN(item.upside));
 
                     resolve(data);
