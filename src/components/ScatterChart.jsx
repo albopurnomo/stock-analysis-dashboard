@@ -10,7 +10,8 @@ import {
     ResponsiveContainer,
     LabelList,
     ReferenceLine,
-    ReferenceArea
+    ReferenceArea,
+    Cell
 } from 'recharts';
 
 const CustomTooltip = ({ active, payload }) => {
@@ -30,6 +31,29 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 const ScatterChart = ({ data }) => {
+    const [hoveredTicker, setHoveredTicker] = React.useState(null);
+
+    const renderCustomLabel = (props) => {
+        const { x, y, value } = props;
+        const isHovered = hoveredTicker === value;
+        const isDimmed = hoveredTicker !== null && !isHovered;
+
+        return (
+            <text 
+                x={x} 
+                y={y - (isHovered ? 15 : 12)} 
+                fill={isHovered ? '#0ea5e9' : '#fff'} 
+                fontSize={isHovered ? 12 : 10} 
+                fontWeight="bold" 
+                textAnchor="middle" 
+                fillOpacity={isDimmed ? 0.2 : 1}
+                style={{ transition: 'fill-opacity 0.15s ease, font-size 0.15s ease, fill 0.15s ease', pointerEvents: 'none' }}
+            >
+                {value}
+            </text>
+        );
+    };
+
     return (
         <div className="chart-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
             {/* Top Quadrant Labels */}
@@ -48,6 +72,7 @@ const ScatterChart = ({ data }) => {
                 <ResponsiveContainer width="100%" height={500}>
                 <ReChartsScatterChart
                     margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                    onMouseLeave={() => setHoveredTicker(null)}
                 >
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                     
@@ -89,8 +114,34 @@ const ScatterChart = ({ data }) => {
                     />
                     <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
                     
-                    <Scatter name="Stocks" data={data} fill="#38bdf8">
-                        <LabelList dataKey="ticker" position="top" style={{ fill: '#fff', fontSize: '10px', fontWeight: 'bold' }} />
+                    <Scatter 
+                        name="Stocks" 
+                        data={data} 
+                        fill="#38bdf8"
+                        style={{ cursor: 'pointer' }}
+                        onMouseEnter={(e) => {
+                            if (e && e.ticker) setHoveredTicker(e.ticker);
+                        }}
+                        isAnimationActive={false}
+                    >
+                        {data.map((entry, index) => {
+                            const isHovered = hoveredTicker === entry.ticker;
+                            const isDimmed = hoveredTicker !== null && !isHovered;
+                            return (
+                                <Cell 
+                                    key={`cell-${index}`} 
+                                    fill={isHovered ? '#0ea5e9' : '#38bdf8'} 
+                                    fillOpacity={isDimmed ? 0.2 : 1}
+                                    stroke={isHovered ? '#fff' : 'none'}
+                                    strokeWidth={isHovered ? 2 : 0}
+                                    style={{ 
+                                        transition: 'fill-opacity 0.15s ease, fill 0.15s ease',
+                                        filter: isHovered ? 'drop-shadow(0 0 8px rgba(14, 165, 233, 0.8))' : 'none'
+                                    }} 
+                                />
+                            );
+                        })}
+                        <LabelList dataKey="ticker" content={renderCustomLabel} />
                     </Scatter>
                 </ReChartsScatterChart>
             </ResponsiveContainer>
