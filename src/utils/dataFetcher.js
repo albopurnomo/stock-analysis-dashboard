@@ -1,6 +1,32 @@
 import Papa from 'papaparse';
 
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=508838081';
+const AUTH_SHEET_URL = 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=26632243';
+
+export const checkAuthorization = async (email) => {
+    if (!email) return false;
+    try {
+        const response = await fetch(AUTH_SHEET_URL);
+        const csvString = await response.text();
+        
+        return new Promise((resolve) => {
+            Papa.parse(csvString, {
+                header: false,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    // Normalize all emails to lower case for insensitive comparison
+                    const authorizedEmails = results.data.flat().map(e => e.toString().toLowerCase().trim());
+                    const isAuthorized = authorizedEmails.includes(email.toLowerCase().trim());
+                    resolve(isAuthorized);
+                },
+                error: () => resolve(false)
+            });
+        });
+    } catch (err) {
+        console.error('Auth check failed:', err);
+        return false;
+    }
+};
 
 export const fetchStockData = async () => {
     try {
