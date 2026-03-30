@@ -2,6 +2,33 @@ import Papa from 'papaparse';
 
 const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=508838081';
 const AUTH_SHEET_URL = 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=26632243';
+const AUTH_PHONE_URL = 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=1896058999';
+
+export const checkPhoneAuthorization = async (phone) => {
+    if (!phone) return false;
+    try {
+        const response = await fetch(AUTH_PHONE_URL);
+        const csvString = await response.text();
+        
+        return new Promise((resolve) => {
+            Papa.parse(csvString, {
+                header: false,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    // Extract all numbers and strip non-numeric characters for comparison
+                    const authorizedPhones = results.data.flat().map(p => p.toString().replace(/\D/g, ''));
+                    const inputPhone = phone.toString().replace(/\D/g, '');
+                    const isAuthorized = authorizedPhones.includes(inputPhone);
+                    resolve(isAuthorized);
+                },
+                error: () => resolve(false)
+            });
+        });
+    } catch (err) {
+        console.error('Phone auth check failed:', err);
+        return false;
+    }
+};
 
 export const checkAuthorization = async (email) => {
     if (!email) return false;

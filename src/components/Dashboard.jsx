@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchStockData, checkAuthorization } from '../utils/dataFetcher';
+import { fetchStockData, checkAuthorization, checkPhoneAuthorization } from '../utils/dataFetcher';
 import ScatterChart from './ScatterChart';
 import StockTable from './StockTable';
 
@@ -13,14 +13,23 @@ const Dashboard = () => {
         const validate = async () => {
             const params = new URLSearchParams(window.location.search);
             const email = params.get('email');
+            const phone = params.get('phone');
             
-            if (!email) {
+            if (!email && !phone) {
                 setIsAuthorized(false);
                 setLoading(false);
                 return;
             }
 
-            const authorized = await checkAuthorization(email);
+            let authorized = false;
+            if (email) {
+                authorized = await checkAuthorization(email);
+            }
+            
+            if (!authorized && phone) {
+                authorized = await checkPhoneAuthorization(phone);
+            }
+
             setIsAuthorized(authorized);
             
             if (authorized) {
@@ -59,9 +68,9 @@ const Dashboard = () => {
                 <div className="unauthorized-card">
                     <div className="lock-icon">🔒</div>
                     <h1>Access Denied</h1>
-                    <p>This dashboard is private. Please ensure you are using an authorized email parameter in the URL.</p>
+                    <p>This dashboard is private. Please ensure you are using an authorized phone number parameter in the URL.</p>
                     <div className="url-hint">
-                        Example: <code>?email=your.email@example.com</code>
+                        Example: <code>?phone=08123456789</code>
                     </div>
                 </div>
             </div>
