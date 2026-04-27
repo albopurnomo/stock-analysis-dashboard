@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   web:
     build: .
     ports:
       - "8888:8888"
-    volumes:
-      - .:/app
-      - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true # Useful for hot-reloading on Windows/Docker
+      - NODE_ENV=production
+      - STOCKS_SHEET_URL=https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=508838081
+      - EMAILS_SHEET_URL=https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=26632243
+      - PHONES_SHEET_URL=https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=1896058999

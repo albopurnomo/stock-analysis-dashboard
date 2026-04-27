@@ -1,20 +1,19 @@
-# Use Node.js as the base image
-FROM node:20-slim
-
-# Set working directory
+# Stage 1: Build the React app
+FROM node:20-slim AS build
 WORKDIR /app
-
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
-
-# Copy project files
 COPY . .
+RUN npm run build
 
-# Expose port
+# Stage 2: Serve with Node.js Express proxy
+FROM node:20-slim
+WORKDIR /app
+COPY package*.json ./
+# Install production dependencies only
+RUN npm install --omit=dev
+COPY --from=build /app/dist ./dist
+COPY server.js ./
+
 EXPOSE 8888
-
-# Start Vite dev server with host flag for Docker networking
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "start"]
