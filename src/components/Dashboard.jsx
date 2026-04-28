@@ -8,6 +8,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [isAuthorized, setIsAuthorized] = useState(null); // null = validating, true = authorized, false = denied
     const [personName, setPersonName] = useState('');
+    const [clientId, setClientId] = useState('');
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -37,6 +38,9 @@ const Dashboard = () => {
 
             setIsAuthorized(authorized);
             setPersonName(name);
+            if (phone && authorized) {
+                setClientId(phone);
+            }
             
             if (authorized) {
                 getData();
@@ -107,7 +111,12 @@ const Dashboard = () => {
             <header className="dashboard-header">
                 <h1>Fundamental Analysis Dashboard</h1>
                 <p>Analyzing company quality vs market potential</p>
-                {personName && <p className="greeting">{getGreeting()}</p>}
+                {personName && (
+                    <>
+                        <p className="greeting">{getGreeting()}</p>
+                        <p className="client-id">Client ID: {clientId}</p>
+                    </>
+                )}
             </header>
 
             <section className="chart-section">

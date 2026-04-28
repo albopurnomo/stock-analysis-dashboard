@@ -63,6 +63,13 @@ body {
     animation: fadeIn 0.8s ease-out;
 }
 
+.dashboard-header .client-id {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+    opacity: 0.8;
+}
+
 /* Sections */
 .chart-section,
 .table-section {
