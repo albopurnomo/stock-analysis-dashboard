@@ -55,6 +55,14 @@ body {
     font-size: 1.1rem;
 }
 
+.dashboard-header .greeting {
+    color: var(--accent-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    animation: fadeIn 0.8s ease-out;
+}
+
 /* Sections */
 .chart-section,
 .table-section {

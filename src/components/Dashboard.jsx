@@ -7,6 +7,7 @@ const Dashboard = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAuthorized, setIsAuthorized] = useState(null); // null = validating, true = authorized, false = denied
+    const [personName, setPersonName] = useState('');
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -22,15 +23,20 @@ const Dashboard = () => {
             }
 
             let authorized = false;
+            let name = '';
+            
             if (email) {
                 authorized = await checkAuthorization(email);
             }
             
             if (!authorized && phone) {
-                authorized = await checkPhoneAuthorization(phone);
+                const phoneAuth = await checkPhoneAuthorization(phone);
+                authorized = phoneAuth.isAuthorized;
+                name = phoneAuth.name;
             }
 
             setIsAuthorized(authorized);
+            setPersonName(name);
             
             if (authorized) {
                 getData();
@@ -54,6 +60,23 @@ const Dashboard = () => {
 
         validate();
     }, []);
+
+    const getGreeting = () => {
+        const date = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
+        const hour = date.getHours();
+        
+        let timeOfDay = 'morning';
+        if (hour >= 12 && hour < 18) {
+            timeOfDay = 'afternoon';
+        } else if (hour >= 18) {
+            timeOfDay = 'evening';
+        }
+
+        if (personName) {
+            return `Good ${timeOfDay}, ${personName}`;
+        }
+        return '';
+    };
 
     if (loading) return (
         <div className="loading-container">
@@ -84,6 +107,7 @@ const Dashboard = () => {
             <header className="dashboard-header">
                 <h1>Fundamental Analysis Dashboard</h1>
                 <p>Analyzing company quality vs market potential</p>
+                {personName && <p className="greeting">{getGreeting()}</p>}
             </header>
 
             <section className="chart-section">

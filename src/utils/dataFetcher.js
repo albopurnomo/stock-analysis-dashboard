@@ -5,7 +5,7 @@ const EMAILS_API = '/api/auth/emails';
 const PHONES_API = '/api/auth/phones';
 
 export const checkPhoneAuthorization = async (phone) => {
-    if (!phone) return false;
+    if (!phone) return { isAuthorized: false, name: '' };
     try {
         const response = await fetch(PHONES_API);
         const csvString = await response.text();
@@ -15,18 +15,26 @@ export const checkPhoneAuthorization = async (phone) => {
                 header: false,
                 skipEmptyLines: true,
                 complete: (results) => {
-                    // Extract all numbers and strip non-numeric characters for comparison
-                    const authorizedPhones = results.data.flat().map(p => p.toString().replace(/\D/g, ''));
-                    const inputPhone = phone.toString().replace(/\D/g, '');
-                    const isAuthorized = authorizedPhones.includes(inputPhone);
-                    resolve(isAuthorized);
+                    const inputPhone = phone.toString().replace(/\\D/g, '');
+                    let isAuthorized = false;
+                    let name = '';
+
+                    for (const row of results.data) {
+                        const rowPhone = row[0]?.toString().replace(/\\D/g, '');
+                        if (rowPhone === inputPhone) {
+                            isAuthorized = true;
+                            name = row[1]?.toString().trim() || '';
+                            break;
+                        }
+                    }
+                    resolve({ isAuthorized, name });
                 },
-                error: () => resolve(false)
+                error: () => resolve({ isAuthorized: false, name: '' })
             });
         });
     } catch (err) {
         console.error('Phone auth check failed:', err);
-        return false;
+        return { isAuthorized: false, name: '' };
     }
 };
 
