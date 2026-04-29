@@ -59,18 +59,18 @@ const ScatterChart = ({ data }) => {
     const renderCustomLabel = (props) => {
         const { x, y, value } = props;
         const isHovered = hoveredTicker === value;
-        const isDimmed = hoveredTicker !== null && !isHovered;
+
+        if (!isHovered) return null;
 
         return (
             <text 
                 x={x} 
-                y={y - (isHovered ? 15 : 12)} 
-                fill={isHovered ? '#0ea5e9' : '#fff'} 
-                fontSize={isHovered ? 12 : 10} 
+                y={y - 15} 
+                fill="#0ea5e9" 
+                fontSize={12} 
                 fontWeight="bold" 
                 textAnchor="middle" 
-                fillOpacity={isDimmed ? 0.2 : 1}
-                style={{ transition: 'fill-opacity 0.15s ease, font-size 0.15s ease, fill 0.15s ease', pointerEvents: 'none' }}
+                style={{ pointerEvents: 'none' }}
             >
                 {value}
             </text>
