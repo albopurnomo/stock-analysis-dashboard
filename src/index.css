@@ -130,12 +130,42 @@ body {
     border-collapse: collapse;
 }
 
+.table-wrapper {
+    max-height: 570px;
+    overflow-y: auto;
+    padding-right: 4px;
+    overscroll-behavior: contain;
+}
+
+/* Custom Scrollbar */
+.table-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.4); /* Transparent accent color */
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(56, 189, 248, 0.8);
+}
+
 .stock-table th {
     text-align: left;
     padding: 1rem;
     color: var(--text-secondary);
     border-bottom: 1px solid var(--glass-border);
     font-weight: 600;
+    position: sticky;
+    top: 0;
+    background: #1e293b; /* Opaque background to hide content below */
+    z-index: 10;
 }
 
 .stock-table td {
