@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchStockData, checkAuthorization, checkPhoneAuthorization } from '../utils/dataFetcher';
+import { fetchStockData, checkAuthorization, checkPhoneAuthorization, logAccessAttempt } from '../utils/dataFetcher';
 import ScatterChart from './ScatterChart';
 import StockTable from './StockTable';
 
@@ -17,24 +17,31 @@ const Dashboard = () => {
             const email = params.get('email');
             const phone = params.get('phone');
             
-            if (!email && !phone) {
-                setIsAuthorized(false);
-                setLoading(false);
-                return;
-            }
-
             let authorized = false;
             let name = '';
+            let logPhone = 'UNKNOWN';
+            let logName = 'UNKNOWN';
             
-            if (email) {
-                authorized = await checkAuthorization(email);
-            }
-            
-            if (!authorized && phone) {
+            if (phone) {
+                logPhone = phone;
                 const phoneAuth = await checkPhoneAuthorization(phone);
                 authorized = phoneAuth.isAuthorized;
-                name = phoneAuth.name;
+                if (authorized) {
+                    name = phoneAuth.name;
+                    logName = phoneAuth.name;
+                } else {
+                    logName = 'UNKNOWN';
+                }
+            } else {
+                logPhone = 'UNKNOWN';
+                logName = 'UNKNOWN';
+                if (email) {
+                    authorized = await checkAuthorization(email);
+                }
             }
+
+            // Log access attempt asynchronously
+            logAccessAttempt(logPhone, logName);
 
             setIsAuthorized(authorized);
             setPersonName(name);

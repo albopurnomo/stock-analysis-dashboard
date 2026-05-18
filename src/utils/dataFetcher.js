@@ -4,6 +4,20 @@ const STOCKS_API = '/api/stocks';
 const EMAILS_API = '/api/auth/emails';
 const PHONES_API = '/api/auth/phones';
 
+export const logAccessAttempt = async (phone, name) => {
+    try {
+        await fetch('/api/log-access', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ phone, name })
+        });
+    } catch (err) {
+        console.error('Failed to log access attempt:', err);
+    }
+};
+
 export const checkPhoneAuthorization = async (phone) => {
     if (!phone) return { isAuthorized: false, name: '' };
     try {
