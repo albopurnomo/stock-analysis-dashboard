@@ -21,6 +21,7 @@ app.use(express.json());
 const STOCKS_URL = process.env.STOCKS_SHEET_URL || 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=508838081';
 const EMAILS_URL = process.env.EMAILS_SHEET_URL || 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=26632243';
 const PHONES_URL = process.env.PHONES_SHEET_URL || 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=1896058999';
+const CATEGORIES_URL = process.env.CATEGORIES_SHEET_URL || 'https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=1641675094';
 
 // API Endpoints
 app.get('/api/stocks', async (req, res) => {
@@ -30,6 +31,16 @@ app.get('/api/stocks', async (req, res) => {
     } catch (error) {
         console.error('Error fetching stocks:', error.message);
         res.status(500).send('Error fetching stock data');
+    }
+});
+
+app.get('/api/categories', async (req, res) => {
+    try {
+        const response = await axios.get(CATEGORIES_URL);
+        res.send(response.data);
+    } catch (error) {
+        console.error('Error fetching categories:', error.message);
+        res.status(500).send('Error fetching category data');
     }
 });
 

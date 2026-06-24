@@ -124,3 +124,55 @@ export const fetchStockData = async () => {
         throw error;
     }
 };
+
+export const fetchCategoryData = async () => {
+    try {
+        const response = await fetch('/api/categories');
+        const csvString = await response.text();
+
+        return new Promise((resolve, reject) => {
+            Papa.parse(csvString, {
+                header: false,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    // Find the category row dynamically by checking if any cell contains 'return on equity'
+                    const catRowIndex = results.data.findIndex(row => 
+                        row.some(cell => cell && cell.toString().toLowerCase().includes('return on equity'))
+                    );
+                    
+                    if (catRowIndex === -1) {
+                        resolve({});
+                        return;
+                    }
+                    
+                    const headers = results.data[catRowIndex];
+                    const categoriesData = {};
+                    
+                    // headers index 0 might be empty or a label. We process each column starting from index 1.
+                    for (let col = 1; col < headers.length; col++) {
+                        const categoryName = headers[col]?.toString().trim();
+                        if (!categoryName) continue;
+                        
+                        const tickers = [];
+                        for (let row = catRowIndex + 1; row < results.data.length; row++) {
+                            const ticker = results.data[row][col]?.toString().trim();
+                            if (ticker) {
+                                tickers.push(ticker);
+                            }
+                        }
+                        categoriesData[categoryName] = tickers;
+                    }
+                    
+                    resolve(categoriesData);
+                },
+                error: (error) => {
+                    reject(error);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error fetching category data:', error);
+        throw error;
+    }
+};
+

@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { fetchStockData, checkAuthorization, checkPhoneAuthorization, logAccessAttempt } from '../utils/dataFetcher';
+import { fetchStockData, fetchCategoryData, checkAuthorization, checkPhoneAuthorization, logAccessAttempt } from '../utils/dataFetcher';
 import ScatterChart from './ScatterChart';
 import StockTable from './StockTable';
+import CategoryPage from './CategoryPage';
+import CategoryDetailPage from './CategoryDetailPage';
 
 const Dashboard = () => {
     const [data, setData] = useState([]);
+    const [categories, setCategories] = useState({});
     const [loading, setLoading] = useState(true);
     const [isAuthorized, setIsAuthorized] = useState(null); // null = validating, true = authorized, false = denied
     const [personName, setPersonName] = useState('');
     const [clientId, setClientId] = useState('');
     const [error, setError] = useState(null);
+    const [page, setPage] = useState('home'); // 'home', 'categories', 'category-detail'
+    const [selectedCategory, setSelectedCategory] = useState('');
 
     useEffect(() => {
         const validate = async () => {
@@ -59,8 +64,12 @@ const Dashboard = () => {
         const getData = async () => {
             try {
                 setLoading(true);
-                const stockData = await fetchStockData();
+                const [stockData, categoriesData] = await Promise.all([
+                    fetchStockData(),
+                    fetchCategoryData()
+                ]);
                 setData(stockData);
+                setCategories(categoriesData);
                 setLoading(false);
             } catch (err) {
                 console.error('Failed to load data:', err);
@@ -124,15 +133,57 @@ const Dashboard = () => {
                         <p className="client-id">Client ID: {clientId}</p>
                     </>
                 )}
+
+                <nav className="dashboard-nav">
+                    <button 
+                        className={`nav-tab ${page === 'home' ? 'active' : ''}`}
+                        onClick={() => setPage('home')}
+                    >
+                        Home
+                    </button>
+                    <button 
+                        className={`nav-tab ${(page === 'categories' || page === 'category-detail') ? 'active' : ''}`}
+                        onClick={() => setPage('categories')}
+                    >
+                        Category
+                    </button>
+                </nav>
             </header>
 
-            <section className="chart-section">
-                <ScatterChart data={data} />
-            </section>
+            {page === 'home' && (
+                <>
+                    <section className="chart-section animate-fade-in">
+                        <ScatterChart data={data} />
+                    </section>
 
-            <section className="table-section">
-                <StockTable data={data} />
-            </section>
+                    <section className="table-section animate-fade-in">
+                        <StockTable data={data} />
+                    </section>
+                </>
+            )}
+
+            {page === 'categories' && (
+                <section className="categories-section animate-fade-in">
+                    <CategoryPage 
+                        categories={categories} 
+                        onSelectCategory={(catName) => {
+                            setSelectedCategory(catName);
+                            setPage('category-detail');
+                        }}
+                    />
+                </section>
+            )}
+
+            {page === 'category-detail' && (
+                <section className="category-detail-section animate-fade-in">
+                    <CategoryDetailPage 
+                        categoryName={selectedCategory}
+                        categoryTickers={categories[selectedCategory]}
+                        allStocks={data}
+                        onBack={() => setPage('categories')}
+                    />
+                </section>
+            )}
         </div>
     );
 };

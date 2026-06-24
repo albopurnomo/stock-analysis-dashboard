@@ -8,4 +8,5 @@ services:
       - STOCKS_SHEET_URL=https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=508838081
       - EMAILS_SHEET_URL=https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=26632243
       - PHONES_SHEET_URL=https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=1896058999
+      - CATEGORIES_SHEET_URL=https://docs.google.com/spreadsheets/d/187j6lXH42kH2kq-T2k5c4SdKDxMTYB6u/export?format=csv&gid=1641675094
       - ACCESS_LOGS_SCRIPT_URL
