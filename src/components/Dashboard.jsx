@@ -15,6 +15,7 @@ const Dashboard = () => {
     const [error, setError] = useState(null);
     const [page, setPage] = useState('home'); // 'home', 'categories', 'category-detail'
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedQuadrant, setSelectedQuadrant] = useState(null);
 
     useEffect(() => {
         const validate = async () => {
@@ -153,11 +154,18 @@ const Dashboard = () => {
             {page === 'home' && (
                 <>
                     <section className="chart-section animate-fade-in">
-                        <ScatterChart data={data} />
+                        <ScatterChart 
+                            data={data} 
+                            selectedQuadrant={selectedQuadrant}
+                            setSelectedQuadrant={setSelectedQuadrant}
+                        />
                     </section>
 
                     <section className="table-section animate-fade-in">
-                        <StockTable data={data} />
+                        <StockTable 
+                            data={data} 
+                            selectedQuadrant={selectedQuadrant}
+                        />
                     </section>
                 </>
             )}

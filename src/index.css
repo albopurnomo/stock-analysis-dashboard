@@ -558,4 +558,98 @@ body {
 .category-grid .animate-card:nth-child(5) { animation-delay: 0.25s; }
 .category-grid .animate-card:nth-child(6) { animation-delay: 0.3s; }
 .category-grid .animate-card:nth-child(7) { animation-delay: 0.35s; }
-.category-grid .animate-card:nth-child(8) { animation-delay: 0.4s; }
+.category-grid .animate-card:nth-child(8) { animation-delay: 0.4s; }
+
+/* Interactive Quadrant Buttons */
+.quadrant-buttons-container {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.quadrant-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.quadrant-btn:hover {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.quadrant-btn:active {
+    transform: translateY(0);
+}
+
+.btn-quadrant-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
+
+.btn-quadrant-desc {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+/* Active Quadrant Styles */
+.quadrant-btn.q1-btn.active {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+}
+.quadrant-btn.q1-btn.active .btn-quadrant-title {
+    color: #22c55e;
+}
+
+.quadrant-btn.q2-btn.active {
+    border-color: #eab308;
+    background: rgba(234, 179, 8, 0.1);
+    box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+}
+.quadrant-btn.q2-btn.active .btn-quadrant-title {
+    color: #eab308;
+}
+
+.quadrant-btn.q3-btn.active {
+    border-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+}
+.quadrant-btn.q3-btn.active .btn-quadrant-title {
+    color: #38bdf8;
+}
+
+.quadrant-btn.q4-btn.active {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+.quadrant-btn.q4-btn.active .btn-quadrant-title {
+    color: #ef4444;
+}
+
+@media (max-width: 900px) {
+    .quadrant-buttons-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+

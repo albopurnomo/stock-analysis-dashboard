@@ -30,7 +30,7 @@ const CustomTooltip = ({ active, payload }) => {
     return null;
 };
 
-const ScatterChart = ({ data }) => {
+const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
     const [hoveredTicker, setHoveredTicker] = React.useState(null);
     const hoverTimeoutRef = React.useRef(null);
 
@@ -40,6 +40,12 @@ const ScatterChart = ({ data }) => {
             hoverTimeoutRef.current = null;
         }
         if (node && node.ticker) {
+            if (selectedQuadrant !== null) {
+                const stockQuad = getStockQuadrant(node);
+                if (stockQuad !== selectedQuadrant) {
+                    return; // Ignore hover on dots outside selected quadrant
+                }
+            }
             setHoveredTicker(node.ticker);
         }
     };
@@ -77,20 +83,23 @@ const ScatterChart = ({ data }) => {
         );
     };
 
-    return (
-        <div className="chart-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
-            {/* Top Quadrant Labels */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10% 0 5%' }}>
-                <div className="quadrant-box" style={{ width: '40%' }}>
-                    <div className="quadrant-title">Quadrant 3</div>
-                    <div className="quadrant-desc">Excellent Company + High Premium</div>
-                </div>
-                <div className="quadrant-box" style={{ width: '40%' }}>
-                    <div className="quadrant-title">Quadrant 1</div>
-                    <div className="quadrant-desc">Excellent Company + Attractive Price</div>
-                </div>
-            </div>
+    const getStockQuadrant = (stock) => {
+        const isQualityHigh = stock.fundamentalScore >= 7.5;
+        const isUpsidePositive = stock.upside >= 0;
+        if (isQualityHigh && isUpsidePositive) return 1;
+        if (!isQualityHigh && isUpsidePositive) return 2;
+        if (isQualityHigh && !isUpsidePositive) return 3;
+        return 4;
+    };
 
+    // Opacity helpers for ReferenceArea based on selection
+    const getAreaOpacity = (quadrantNum) => {
+        if (selectedQuadrant === null) return 0.05;
+        return selectedQuadrant === quadrantNum ? 0.22 : 0.01;
+    };
+
+    return (
+        <div className="chart-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
             <div className="chart-container" style={{ position: 'relative' }}>
                 <ResponsiveContainer width="100%" height={500}>
                 <ReChartsScatterChart
@@ -100,10 +109,14 @@ const ScatterChart = ({ data }) => {
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                     
                     {/* Quadrant Areas */}
-                    <ReferenceArea x1={0} x2={250} y1={7.5} y2={9} fill="rgba(34, 197, 94, 0.05)" stroke="none" />
-                    <ReferenceArea x1={-100} x2={0} y1={7.5} y2={9} fill="rgba(56, 189, 248, 0.05)" stroke="none" />
-                    <ReferenceArea x1={0} x2={250} y1={5.5} y2={7.5} fill="rgba(234, 179, 8, 0.05)" stroke="none" />
-                    <ReferenceArea x1={-100} x2={0} y1={5.5} y2={7.5} fill="rgba(239, 68, 68, 0.05)" stroke="none" />
+                    {/* Quadrant 1: Excellent Company + Attractive Price */}
+                    <ReferenceArea x1={0} x2={250} y1={7.5} y2={9} fill="rgba(34, 197, 94, 0.05)" fillOpacity={getAreaOpacity(1)} stroke="none" />
+                    {/* Quadrant 3: Excellent Company + High Premium */}
+                    <ReferenceArea x1={-100} x2={0} y1={7.5} y2={9} fill="rgba(56, 189, 248, 0.05)" fillOpacity={getAreaOpacity(3)} stroke="none" />
+                    {/* Quadrant 2: Good Company + Attractive Price */}
+                    <ReferenceArea x1={0} x2={250} y1={5.5} y2={7.5} fill="rgba(234, 179, 8, 0.05)" fillOpacity={getAreaOpacity(2)} stroke="none" />
+                    {/* Quadrant 4: Good Company + High Premium */}
+                    <ReferenceArea x1={-100} x2={0} y1={5.5} y2={7.5} fill="rgba(239, 68, 68, 0.05)" fillOpacity={getAreaOpacity(4)} stroke="none" />
 
                     <ReferenceLine x={0} stroke="#666" strokeWidth={2} label={{ value: '0%', fill: '#666', position: 'insideBottomLeft' }} />
                     <ReferenceLine y={7.5} stroke="#666" strokeWidth={2} label={{ value: '7.5', fill: '#666', position: 'insideLeft' }} />
@@ -148,17 +161,28 @@ const ScatterChart = ({ data }) => {
                     >
                         {data.map((entry, index) => {
                             const isHovered = hoveredTicker === entry.ticker;
-                            const isDimmed = hoveredTicker !== null && !isHovered;
+                            const stockQuad = getStockQuadrant(entry);
+                            
+                            // Dimming logic
+                            let isDimmed = false;
+                            if (hoveredTicker !== null) {
+                                isDimmed = !isHovered;
+                            } else if (selectedQuadrant !== null) {
+                                isDimmed = stockQuad !== selectedQuadrant;
+                            }
+
                             return (
                                 <Cell 
                                     key={`cell-${index}`} 
                                     fill={isHovered ? '#0ea5e9' : '#38bdf8'} 
-                                    fillOpacity={isDimmed ? 0.2 : 1}
+                                    fillOpacity={isDimmed ? 0.15 : 1}
                                     stroke={isHovered ? '#fff' : 'none'}
                                     strokeWidth={isHovered ? 2 : 0}
                                     style={{ 
                                         transition: 'fill-opacity 0.15s ease, fill 0.15s ease',
-                                        filter: isHovered ? 'drop-shadow(0 0 8px rgba(14, 165, 233, 0.8))' : 'none'
+                                        filter: isHovered ? 'drop-shadow(0 0 8px rgba(14, 165, 233, 0.8))' : 'none',
+                                        pointerEvents: (selectedQuadrant !== null && stockQuad !== selectedQuadrant) ? 'none' : 'auto',
+                                        cursor: (selectedQuadrant !== null && stockQuad !== selectedQuadrant) ? 'default' : 'pointer'
                                     }} 
                                 />
                             );
@@ -168,19 +192,38 @@ const ScatterChart = ({ data }) => {
                 </ReChartsScatterChart>
             </ResponsiveContainer>
             </div>
-            
-            {/* Bottom Quadrant Labels */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 10% 0 5%' }}>
-                <div className="quadrant-box" style={{ width: '40%' }}>
-                    <div className="quadrant-title">Quadrant 4</div>
-                    <div className="quadrant-desc">Good Company + High Premium</div>
-                </div>
-                <div className="quadrant-box" style={{ width: '40%' }}>
-                    <div className="quadrant-title">Quadrant 2</div>
-                    <div className="quadrant-desc">Good Company + Attractive Price</div>
-                </div>
-            </div>
 
+            {/* Quadrant buttons replacing static labels */}
+            <div className="quadrant-buttons-container">
+                <button 
+                    className={`quadrant-btn q1-btn ${selectedQuadrant === 1 ? 'active' : ''}`}
+                    onClick={() => setSelectedQuadrant(selectedQuadrant === 1 ? null : 1)}
+                >
+                    <span className="btn-quadrant-title">Quadrant 1</span>
+                    <span className="btn-quadrant-desc">Excellent Company + Attractive Price</span>
+                </button>
+                <button 
+                    className={`quadrant-btn q2-btn ${selectedQuadrant === 2 ? 'active' : ''}`}
+                    onClick={() => setSelectedQuadrant(selectedQuadrant === 2 ? null : 2)}
+                >
+                    <span className="btn-quadrant-title">Quadrant 2</span>
+                    <span className="btn-quadrant-desc">Good Company + Attractive Price</span>
+                </button>
+                <button 
+                    className={`quadrant-btn q3-btn ${selectedQuadrant === 3 ? 'active' : ''}`}
+                    onClick={() => setSelectedQuadrant(selectedQuadrant === 3 ? null : 3)}
+                >
+                    <span className="btn-quadrant-title">Quadrant 3</span>
+                    <span className="btn-quadrant-desc">Excellent Company + High Premium</span>
+                </button>
+                <button 
+                    className={`quadrant-btn q4-btn ${selectedQuadrant === 4 ? 'active' : ''}`}
+                    onClick={() => setSelectedQuadrant(selectedQuadrant === 4 ? null : 4)}
+                >
+                    <span className="btn-quadrant-title">Quadrant 4</span>
+                    <span className="btn-quadrant-desc">Good Company + High Premium</span>
+                </button>
+            </div>
         </div>
     );
 };

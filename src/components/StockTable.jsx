@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
 
-const StockTable = ({ data }) => {
+const StockTable = ({ data, selectedQuadrant }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredData = data.filter(stock =>
-        stock.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        stock.businessModel.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const getStockQuadrant = (stock) => {
+        const isQualityHigh = stock.fundamentalScore >= 7.5;
+        const isUpsidePositive = stock.upside >= 0;
+        if (isQualityHigh && isUpsidePositive) return 1;
+        if (!isQualityHigh && isUpsidePositive) return 2;
+        if (isQualityHigh && !isUpsidePositive) return 3;
+        return 4;
+    };
+
+    const filteredData = data.filter(stock => {
+        const matchesSearch = stock.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            stock.businessModel.toLowerCase().includes(searchTerm.toLowerCase());
+
+        if (selectedQuadrant !== null) {
+            return matchesSearch && getStockQuadrant(stock) === selectedQuadrant;
+        }
+        return matchesSearch;
+    });
 
     return (
         <div className="table-container">
@@ -33,7 +47,7 @@ const StockTable = ({ data }) => {
                     </thead>
                     <tbody>
                         {filteredData.map((stock, index) => (
-                            <tr key={index} className={stock.upside > 20 && stock.fundamentalScore > 7 ? 'highlight-row' : ''}>
+                            <tr key={index}>
                                 <td>{stock.ticker}</td>
                                 <td>{stock.businessModel}</td>
                                 <td className={stock.upside > 0 ? 'positive' : 'negative'}>
