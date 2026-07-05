@@ -125,11 +125,16 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                         type="number"
                         dataKey="upside"
                         name="Potential"
-                        unit="%"
                         label={{ value: 'Potential (Upside %)', position: 'bottom', fill: '#ccc', offset: 0 }}
                         stroke="#ccc"
                         domain={[-100, 250]}
-                        ticks={[-100, -50, 0, 50, 100, 150, 200, 250]}
+                        ticks={[-100, 0, 250]}
+                        tickFormatter={(value) => {
+                            if (value === -100) return 'Min';
+                            if (value === 0) return '0%';
+                            if (value === 250) return 'Max';
+                            return '';
+                        }}
                     />
                     <YAxis
                         type="number"
@@ -138,7 +143,7 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                         label={{ value: 'Quality (Score)', angle: -90, position: 'left', fill: '#ccc', offset: 10 }}
                         stroke="#ccc"
                         domain={[5.5, 9]}
-                        ticks={[5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9]}
+                        ticks={[5.5, 7.5]}
                     />
                     {/* ZAxis controls the dot size based on Dividend Yield */}
                     <ZAxis 
