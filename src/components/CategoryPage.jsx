@@ -6,8 +6,7 @@ const CategoryPage = ({ categories, onSelectCategory }) => {
     return (
         <div className="category-page">
             <div className="category-header">
-                <h2>Browse by Category</h2>
-                <p>Select a category to view fundamental analysis of its stocks</p>
+                <h2>GaleriSaham List</h2>
             </div>
             
             <div className="category-list">
@@ -21,14 +20,8 @@ const CategoryPage = ({ categories, onSelectCategory }) => {
                         >
                             <div className="category-card-glow"></div>
                             <div className="category-card-content-horizontal">
-                                <div className="category-info-left">
-                                    <span className="category-icon">📁</span>
-                                    <div className="category-title-desc">
-                                        <h3>{name}</h3>
-                                        <span className="ticker-count">{count} {count === 1 ? 'Ticker' : 'Tickers'}</span>
-                                    </div>
-                                </div>
-                                <span className="view-link">View Stocks →</span>
+                                <h3>{name}</h3>
+                                <span className="card-arrow">→</span>
                             </div>
                         </div>
                     );

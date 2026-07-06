@@ -126,13 +126,12 @@ const Dashboard = () => {
     return (
         <div className="dashboard">
             <header className="dashboard-header">
-                <h1>Fundamental Analysis Dashboard</h1>
-                <p>Analyzing company quality vs market potential</p>
+                <h1>GaleriSaham Universe</h1>
+                <p>Smart Money Investment Strategies</p>
                 {personName && (
-                    <>
-                        <p className="greeting">{getGreeting()}</p>
-                        <p className="client-id">Client ID: {clientId}</p>
-                    </>
+                    <p className="greeting">
+                        {getGreeting()}{clientId ? ` (HP No. ${clientId})` : ''}
+                    </p>
                 )}
 
                 <nav className="dashboard-nav">

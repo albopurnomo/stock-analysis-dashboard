@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const StockTable = ({ data, selectedQuadrant }) => {
+const StockTable = ({ data, selectedQuadrant = null }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const getStockQuadrant = (stock) => {
