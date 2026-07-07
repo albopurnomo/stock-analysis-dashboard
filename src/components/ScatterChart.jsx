@@ -118,8 +118,8 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                     {/* Quadrant 4: Good Company + High Premium */}
                     <ReferenceArea x1={-100} x2={0} y1={5.5} y2={7.5} fill="rgba(239, 68, 68, 0.05)" fillOpacity={getAreaOpacity(4)} stroke="none" />
 
-                    <ReferenceLine x={0} stroke="#666" strokeWidth={2} label={{ value: '0%', fill: '#666', position: 'insideBottomLeft' }} />
-                    <ReferenceLine y={7.5} stroke="#666" strokeWidth={2} label={{ value: '7.5', fill: '#666', position: 'insideLeft' }} />
+                    <ReferenceLine x={0} stroke="#666" strokeWidth={2} />
+                    <ReferenceLine y={7.5} stroke="#666" strokeWidth={2} />
 
                     <XAxis
                         type="number"
