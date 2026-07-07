@@ -126,13 +126,10 @@ const Dashboard = () => {
     return (
         <div className="dashboard">
             <header className="dashboard-header">
-                <h1>GaleriSaham Universe</h1>
-                <p>Smart Money Investment Strategies</p>
-                {personName && (
-                    <p className="greeting">
-                        {getGreeting()}{clientId ? ` (HP No. ${clientId})` : ''}
-                    </p>
-                )}
+                <div className="header-brand">
+                    <h1>GaleriSaham Universe</h1>
+                    <span className="header-tagline">Smart Money Investment Strategies</span>
+                </div>
 
                 <nav className="dashboard-nav">
                     <button 
@@ -148,6 +145,15 @@ const Dashboard = () => {
                         Category
                     </button>
                 </nav>
+
+                <div className="header-user">
+                    {personName && (
+                        <p className="greeting">
+                            <span className="greeting-text">{getGreeting()}</span>
+                            {clientId && <span className="greeting-phone"> (HP No. {clientId})</span>}
+                        </p>
+                    )}
+                </div>
             </header>
 
             {page === 'home' && (
