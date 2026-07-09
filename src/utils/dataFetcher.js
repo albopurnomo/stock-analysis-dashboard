@@ -103,13 +103,15 @@ export const fetchStockData = async () => {
                     };
 
                     const data = stockDataRows.map((row) => ({
-                        ticker: getCol(row, 'Ticker'),
-                        businessModel: getCol(row, 'Model bisnis'),
+                        ticker: getCol(row, 'Ticker')?.trim(),
+                        businessModel: getCol(row, 'Model bisnis')?.trim(),
                         upside: parseFloat((getCol(row, 'Upside') || '0').replace('%', '')),
                         fundamentalScore: parseFloat(getCol(row, 'Fundamental Score') || '0'),
-                        price: getCol(row, 'Harga'),
-                        fairValue: getCol(row, 'Fair Value'),
+                        price: getCol(row, 'Harga')?.trim(),
+                        fairValue: getCol(row, 'Fair Value')?.trim(),
                         dividendYield: parseFloat((getCol(row, 'Avg 5y DY') || '0').replace('%', '').replace(',', '.')),
+                        latestDividendYield: getCol(row, 'Latest Dividend Yield')?.trim(),
+                        liquidityScore: getCol(row, 'Likuiditas (Hari)') ? parseFloat(getCol(row, 'Likuiditas (Hari)').trim().replace(',', '.')) : null,
                     })).filter(item => item.ticker && !isNaN(item.upside));
 
                     resolve(data);

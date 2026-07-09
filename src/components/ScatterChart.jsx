@@ -19,15 +19,25 @@ const CustomTooltip = ({ active, payload }) => {
         const data = payload[0].payload;
         return (
             <div className="custom-tooltip">
-                <p className="label"><strong>{data.ticker}</strong></p>
-                <p className="desc">{data.businessModel}</p>
-                <p className="metric">Upside: {data.upside}%</p>
-                <p className="metric">Fundamental Score: {data.fundamentalScore}</p>
-                <p className="metric">Avg 5y DY: {data.dividendYield || 0}%</p>
+                <p className="label"><strong>{data.ticker}: Score {data.fundamentalScore}</strong></p>
+                <p className="desc">Description: {data.businessModel || '-'}</p>
+                <p className="metric">Current Price: {data.price || '-'}</p>
+                <p className="metric">Fair Value: {data.fairValue || '-'}</p>
+                <p className="metric">Dividend Yield: {data.latestDividendYield || '-'}</p>
+                <p className="metric">Liquidity Score: {data.liquidityScore !== null && !isNaN(data.liquidityScore) ? data.liquidityScore : '-'}</p>
             </div>
         );
     }
     return null;
+};
+
+const getLiquidityColor = (score) => {
+    if (score === null || score === undefined || isNaN(score)) return '#38bdf8'; // fallback
+    if (score > 100) return '#ef4444'; // Red
+    if (score >= 61) return '#f59e0b'; // Amber/Orange
+    if (score >= 21) return '#eab308'; // Yellow
+    if (score >= 6) return '#22c55e'; // Green
+    return '#0ea5e9'; // Blue (< 6)
 };
 
 const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
@@ -84,6 +94,7 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
     };
 
     const getStockQuadrant = (stock) => {
+        if (stock.fundamentalScore < 5) return 5;
         const isQualityHigh = stock.fundamentalScore >= 7.5;
         const isUpsidePositive = stock.upside >= 0;
         if (isQualityHigh && isUpsidePositive) return 1;
@@ -100,6 +111,42 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
 
     return (
         <div className="chart-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
+            {/* Liquidity Score Legend */}
+            <div className="liquidity-legend-container" style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '0.75rem 1.5rem',
+                background: 'rgba(15, 23, 42, 0.4)',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                margin: '0 auto'
+            }}>
+                <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '600', marginRight: '0.5rem' }}>
+                    Liquidity Score Legend:
+                </span>
+                {[
+                    { label: '> 100 (Very Low)', color: '#ef4444' },
+                    { label: '61 - 100 (Low)', color: '#f59e0b' },
+                    { label: '21 - 60 (Moderate)', color: '#eab308' },
+                    { label: '6 - 20 (High)', color: '#22c55e' },
+                    { label: '< 6 (Very High)', color: '#0ea5e9' },
+                ].map((item, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}>
+                        <span style={{
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            backgroundColor: item.color,
+                            boxShadow: `0 0 6px ${item.color}`
+                        }} />
+                        <span style={{ color: '#f8fafc', fontWeight: '500' }}>{item.label}</span>
+                    </div>
+                ))}
+            </div>
+
             <div className="chart-container" style={{ position: 'relative' }}>
                 <ResponsiveContainer width="100%" height={500}>
                 <ReChartsScatterChart
@@ -114,12 +161,15 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                     {/* Quadrant 3: Excellent Company + High Premium */}
                     <ReferenceArea x1={-100} x2={0} y1={7.5} y2={9} fill="rgba(56, 189, 248, 0.05)" fillOpacity={getAreaOpacity(3)} stroke="none" />
                     {/* Quadrant 2: Good Company + Attractive Price */}
-                    <ReferenceArea x1={0} x2={250} y1={5.5} y2={7.5} fill="rgba(234, 179, 8, 0.05)" fillOpacity={getAreaOpacity(2)} stroke="none" />
+                    <ReferenceArea x1={0} x2={250} y1={5} y2={7.5} fill="rgba(234, 179, 8, 0.05)" fillOpacity={getAreaOpacity(2)} stroke="none" />
                     {/* Quadrant 4: Good Company + High Premium */}
-                    <ReferenceArea x1={-100} x2={0} y1={5.5} y2={7.5} fill="rgba(239, 68, 68, 0.05)" fillOpacity={getAreaOpacity(4)} stroke="none" />
+                    <ReferenceArea x1={-100} x2={0} y1={5} y2={7.5} fill="rgba(239, 68, 68, 0.05)" fillOpacity={getAreaOpacity(4)} stroke="none" />
+                    {/* Quadrant X: Need more convictions */}
+                    <ReferenceArea x1={-100} x2={250} y1={2} y2={5} fill="rgba(59, 130, 246, 0.05)" fillOpacity={getAreaOpacity(5)} stroke="none" />
 
                     <ReferenceLine x={0} stroke="#666" strokeWidth={2} />
                     <ReferenceLine y={7.5} stroke="#666" strokeWidth={2} />
+                    <ReferenceLine y={5} stroke="#666" strokeWidth={2} />
 
                     <XAxis
                         type="number"
@@ -130,9 +180,7 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                         domain={[-100, 250]}
                         ticks={[-100, 0, 250]}
                         tickFormatter={(value) => {
-                            if (value === -100) return 'Min';
                             if (value === 0) return '0%';
-                            if (value === 250) return 'Max';
                             return '';
                         }}
                     />
@@ -142,8 +190,8 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                         name="Quality"
                         label={{ value: 'Quality (Score)', angle: -90, position: 'left', fill: '#ccc', offset: 10 }}
                         stroke="#ccc"
-                        domain={[5.5, 9]}
-                        ticks={[5.5, 7.5]}
+                        domain={[2, 9]}
+                        ticks={[2, 5, 7.5]}
                     />
                     {/* ZAxis controls the dot size based on Dividend Yield */}
                     <ZAxis 
@@ -167,6 +215,7 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                         {data.map((entry, index) => {
                             const isHovered = hoveredTicker === entry.ticker;
                             const stockQuad = getStockQuadrant(entry);
+                            const baseColor = getLiquidityColor(entry.liquidityScore);
                             
                             // Dimming logic
                             let isDimmed = false;
@@ -179,13 +228,13 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                             return (
                                 <Cell 
                                     key={`cell-${index}`} 
-                                    fill={isHovered ? '#0ea5e9' : '#38bdf8'} 
+                                    fill={baseColor} 
                                     fillOpacity={isDimmed ? 0.15 : 1}
                                     stroke={isHovered ? '#fff' : 'none'}
                                     strokeWidth={isHovered ? 2 : 0}
                                     style={{ 
                                         transition: 'fill-opacity 0.15s ease, fill 0.15s ease',
-                                        filter: isHovered ? 'drop-shadow(0 0 8px rgba(14, 165, 233, 0.8))' : 'none',
+                                        filter: isHovered ? `drop-shadow(0 0 8px ${baseColor})` : 'none',
                                         pointerEvents: (selectedQuadrant !== null && stockQuad !== selectedQuadrant) ? 'none' : 'auto',
                                         cursor: (selectedQuadrant !== null && stockQuad !== selectedQuadrant) ? 'default' : 'pointer'
                                     }} 
@@ -227,6 +276,13 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                 >
                     <span className="btn-quadrant-title">Quadrant 4</span>
                     <span className="btn-quadrant-desc">Good Company + High Premium</span>
+                </button>
+                <button 
+                    className={`quadrant-btn qx-btn ${selectedQuadrant === 5 ? 'active' : ''}`}
+                    onClick={() => setSelectedQuadrant(selectedQuadrant === 5 ? null : 5)}
+                >
+                    <span className="btn-quadrant-title">Quadrant X</span>
+                    <span className="btn-quadrant-desc">Need more convictions</span>
                 </button>
             </div>
         </div>

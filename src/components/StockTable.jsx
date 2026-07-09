@@ -4,6 +4,7 @@ const StockTable = ({ data, selectedQuadrant = null }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const getStockQuadrant = (stock) => {
+        if (stock.fundamentalScore < 5) return 5;
         const isQualityHigh = stock.fundamentalScore >= 7.5;
         const isUpsidePositive = stock.upside >= 0;
         if (isQualityHigh && isUpsidePositive) return 1;
