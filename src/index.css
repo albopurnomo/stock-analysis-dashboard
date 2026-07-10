@@ -277,27 +277,21 @@ html, body {
     }
 
     .dashboard-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
-        padding: 1.5rem 1rem;
-    }
-
-    .header-brand {
-        align-items: center;
-        text-align: center;
+        padding: 0.5rem 1rem;
+        gap: 0.5rem;
     }
 
     .header-brand h1 {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
     }
 
-    .header-user {
-        justify-content: center;
+    .nav-tab {
+        padding: 0.35rem 0.9rem;
+        font-size: 0.8rem;
     }
 
     .dashboard-header .greeting {
-        text-align: center;
+        font-size: 0.8rem;
     }
 }
 /* Quadrant Labels */
