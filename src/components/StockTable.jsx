@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 
-const StockTable = ({ data, selectedQuadrant = null }) => {
-    const [searchTerm, setSearchTerm] = useState('');
+const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm, setSearchTerm: propSetSearchTerm }) => {
+    const [localSearchTerm, localSetSearchTerm] = useState('');
 
+    const isControlled = propSearchTerm !== undefined && propSetSearchTerm !== undefined;
+    const searchTerm = isControlled ? propSearchTerm : localSearchTerm;
+    const setSearchTerm = isControlled ? propSetSearchTerm : localSetSearchTerm;
     const getStockQuadrant = (stock) => {
         if (stock.fundamentalScore < 5) return 5;
         const isQualityHigh = stock.fundamentalScore >= 7.5;
@@ -41,9 +44,12 @@ const StockTable = ({ data, selectedQuadrant = null }) => {
                         <tr>
                             <th>Ticker</th>
                             <th>Business Model</th>
-                            <th>Upside (%)</th>
-                            <th>Fundamental Score</th>
-                            <th>Price</th>
+                            <th>F-Score</th>
+                            <th>Last Price</th>
+                            <th>Fair Value</th>
+                            <th>Upside</th>
+                            <th>Dividend Yield</th>
+                            <th>Liquidity</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,11 +57,14 @@ const StockTable = ({ data, selectedQuadrant = null }) => {
                             <tr key={index}>
                                 <td>{stock.ticker}</td>
                                 <td>{stock.businessModel}</td>
+                                <td className="score">{stock.fundamentalScore}</td>
+                                <td>{stock.price || '-'}</td>
+                                <td>{stock.fairValue || '-'}</td>
                                 <td className={stock.upside > 0 ? 'positive' : 'negative'}>
                                     {stock.upside}%
                                 </td>
-                                <td className="score">{stock.fundamentalScore}</td>
-                                <td>{stock.price}</td>
+                                <td>{stock.latestDividendYield || '-'}</td>
+                                <td>{stock.liquidityScore !== null && !isNaN(stock.liquidityScore) ? stock.liquidityScore : '-'}</td>
                             </tr>
                         ))}
                     </tbody>

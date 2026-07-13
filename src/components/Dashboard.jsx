@@ -16,6 +16,7 @@ const Dashboard = () => {
     const [page, setPage] = useState('home'); // 'home', 'categories', 'category-detail'
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedQuadrant, setSelectedQuadrant] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         const validate = async () => {
@@ -81,6 +82,10 @@ const Dashboard = () => {
 
         validate();
     }, []);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [page, selectedCategory]);
 
     const getGreeting = () => {
         const date = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
@@ -163,6 +168,7 @@ const Dashboard = () => {
                             data={data} 
                             selectedQuadrant={selectedQuadrant}
                             setSelectedQuadrant={setSelectedQuadrant}
+                            searchTerm={searchTerm}
                         />
                     </section>
 
@@ -170,6 +176,8 @@ const Dashboard = () => {
                         <StockTable 
                             data={data} 
                             selectedQuadrant={selectedQuadrant}
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
                         />
                     </section>
                 </>

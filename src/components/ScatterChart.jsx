@@ -40,7 +40,7 @@ const getLiquidityColor = (score) => {
     return '#0ea5e9'; // Blue (< 6)
 };
 
-const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
+const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant, searchTerm }) => {
     const [hoveredTicker, setHoveredTicker] = React.useState(null);
     const hoverTimeoutRef = React.useRef(null);
 
@@ -54,6 +54,13 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                 const stockQuad = getStockQuadrant(node);
                 if (stockQuad !== selectedQuadrant) {
                     return; // Ignore hover on dots outside selected quadrant
+                }
+            }
+            if (searchTerm) {
+                const matchesSearch = node.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    node.businessModel.toLowerCase().includes(searchTerm.toLowerCase());
+                if (!matchesSearch) {
+                    return; // Ignore hover on dots that don't match the search
                 }
             }
             setHoveredTicker(node.ticker);
@@ -76,13 +83,26 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
         const { x, y, value } = props;
         const isHovered = hoveredTicker === value;
 
-        if (!isHovered) return null;
+        const entry = data.find(d => d.ticker === value);
+        if (!entry) return null;
+
+        const matchesSearch = searchTerm
+            ? (entry.ticker.toLowerCase().includes(searchTerm.toLowerCase()) || entry.businessModel.toLowerCase().includes(searchTerm.toLowerCase()))
+            : false;
+
+        const stockQuad = getStockQuadrant(entry);
+        const matchesQuadrant = selectedQuadrant !== null
+            ? stockQuad === selectedQuadrant
+            : true;
+
+        // Show label if hovered, or if it matches the search AND matches the quadrant
+        if (!isHovered && !(matchesSearch && matchesQuadrant)) return null;
 
         return (
             <text 
                 x={x} 
                 y={y - 15} 
-                fill="#0ea5e9" 
+                fill={isHovered ? "#0ea5e9" : "#ffffff"} 
                 fontSize={12} 
                 fontWeight="bold" 
                 textAnchor="middle" 
@@ -217,12 +237,20 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                             const stockQuad = getStockQuadrant(entry);
                             const baseColor = getLiquidityColor(entry.liquidityScore);
                             
+                            const matchesSearch = searchTerm
+                                ? (entry.ticker.toLowerCase().includes(searchTerm.toLowerCase()) || entry.businessModel.toLowerCase().includes(searchTerm.toLowerCase()))
+                                : true;
+
+                            const matchesQuadrant = selectedQuadrant !== null
+                                ? stockQuad === selectedQuadrant
+                                : true;
+
+                            const isInteractive = matchesSearch && matchesQuadrant;
+
                             // Dimming logic
-                            let isDimmed = false;
+                            let isDimmed = !isInteractive;
                             if (hoveredTicker !== null) {
                                 isDimmed = !isHovered;
-                            } else if (selectedQuadrant !== null) {
-                                isDimmed = stockQuad !== selectedQuadrant;
                             }
 
                             return (
@@ -235,8 +263,8 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant }) => {
                                     style={{ 
                                         transition: 'fill-opacity 0.15s ease, fill 0.15s ease',
                                         filter: isHovered ? `drop-shadow(0 0 8px ${baseColor})` : 'none',
-                                        pointerEvents: (selectedQuadrant !== null && stockQuad !== selectedQuadrant) ? 'none' : 'auto',
-                                        cursor: (selectedQuadrant !== null && stockQuad !== selectedQuadrant) ? 'default' : 'pointer'
+                                        pointerEvents: isInteractive ? 'auto' : 'none',
+                                        cursor: isInteractive ? 'pointer' : 'default'
                                     }} 
                                 />
                             );
