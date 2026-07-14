@@ -17,6 +17,23 @@ const Dashboard = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedQuadrant, setSelectedQuadrant] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedTickers, setSelectedTickers] = useState(new Set());
+
+    const toggleTickerSelection = (ticker) => {
+        setSelectedTickers(prev => {
+            const next = new Set(prev);
+            if (next.has(ticker)) {
+                next.delete(ticker);
+            } else {
+                next.add(ticker);
+            }
+            return next;
+        });
+    };
+
+    useEffect(() => {
+        setSelectedTickers(new Set());
+    }, [selectedQuadrant]);
 
     useEffect(() => {
         const validate = async () => {
@@ -169,6 +186,8 @@ const Dashboard = () => {
                             selectedQuadrant={selectedQuadrant}
                             setSelectedQuadrant={setSelectedQuadrant}
                             searchTerm={searchTerm}
+                            selectedTickers={selectedTickers}
+                            toggleTickerSelection={toggleTickerSelection}
                         />
                     </section>
 
@@ -178,6 +197,9 @@ const Dashboard = () => {
                             selectedQuadrant={selectedQuadrant}
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
+                            selectedTickers={selectedTickers}
+                            setSelectedTickers={setSelectedTickers}
+                            toggleTickerSelection={toggleTickerSelection}
                         />
                     </section>
                 </>

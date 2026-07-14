@@ -40,7 +40,7 @@ const getLiquidityColor = (score) => {
     return '#0ea5e9'; // Blue (< 6)
 };
 
-const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant, searchTerm }) => {
+const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant, searchTerm, selectedTickers = new Set(), toggleTickerSelection = null }) => {
     const [hoveredTicker, setHoveredTicker] = React.useState(null);
     const hoverTimeoutRef = React.useRef(null);
 
@@ -82,6 +82,7 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant, searchTerm 
     const renderCustomLabel = (props) => {
         const { x, y, value } = props;
         const isHovered = hoveredTicker === value;
+        const isSelected = selectedTickers.has(value);
 
         const entry = data.find(d => d.ticker === value);
         if (!entry) return null;
@@ -95,14 +96,17 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant, searchTerm 
             ? stockQuad === selectedQuadrant
             : true;
 
-        // Show label if hovered, or if it matches the search AND matches the quadrant
-        if (!isHovered && !(matchesSearch && matchesQuadrant)) return null;
+        // Show label if hovered, selected, or (if no active selection) if it matches the search AND matches the quadrant
+        const hasSelected = selectedTickers.size > 0;
+        const isVisible = isHovered || isSelected || (!hasSelected && matchesSearch && matchesQuadrant);
+
+        if (!isVisible) return null;
 
         return (
             <text 
                 x={x} 
                 y={y - 15} 
-                fill={isHovered ? "#0ea5e9" : "#ffffff"} 
+                fill={isHovered || isSelected ? "#0ea5e9" : "#ffffff"} 
                 fontSize={12} 
                 fontWeight="bold" 
                 textAnchor="middle" 
@@ -234,6 +238,7 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant, searchTerm 
                     >
                         {data.map((entry, index) => {
                             const isHovered = hoveredTicker === entry.ticker;
+                            const isSelected = selectedTickers.has(entry.ticker);
                             const stockQuad = getStockQuadrant(entry);
                             const baseColor = getLiquidityColor(entry.liquidityScore);
                             
@@ -251,6 +256,8 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant, searchTerm 
                             let isDimmed = !isInteractive;
                             if (hoveredTicker !== null) {
                                 isDimmed = !isHovered;
+                            } else if (selectedTickers.size > 0) {
+                                isDimmed = !isSelected;
                             }
 
                             return (
@@ -258,14 +265,19 @@ const ScatterChart = ({ data, selectedQuadrant, setSelectedQuadrant, searchTerm 
                                     key={`cell-${index}`} 
                                     fill={baseColor} 
                                     fillOpacity={isDimmed ? 0.15 : 1}
-                                    stroke={isHovered ? '#fff' : 'none'}
-                                    strokeWidth={isHovered ? 2 : 0}
+                                    stroke={isHovered || isSelected ? '#fff' : 'none'}
+                                    strokeWidth={isHovered || isSelected ? 2 : 0}
                                     style={{ 
                                         transition: 'fill-opacity 0.15s ease, fill 0.15s ease',
-                                        filter: isHovered ? `drop-shadow(0 0 8px ${baseColor})` : 'none',
+                                        filter: isHovered || isSelected ? `drop-shadow(0 0 8px ${baseColor})` : 'none',
                                         pointerEvents: isInteractive ? 'auto' : 'none',
                                         cursor: isInteractive ? 'pointer' : 'default'
                                     }} 
+                                    onClick={() => {
+                                        if (toggleTickerSelection) {
+                                            toggleTickerSelection(entry.ticker);
+                                        }
+                                    }}
                                 />
                             );
                         })}

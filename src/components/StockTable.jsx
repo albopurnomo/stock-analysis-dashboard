@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm, setSearchTerm: propSetSearchTerm }) => {
+const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm, setSearchTerm: propSetSearchTerm, selectedTickers = new Set(), setSelectedTickers = null, toggleTickerSelection = null }) => {
     const [localSearchTerm, localSetSearchTerm] = useState('');
 
     const isControlled = propSearchTerm !== undefined && propSetSearchTerm !== undefined;
@@ -34,7 +34,12 @@ const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm,
                     type="text"
                     placeholder="Search ticker or business model..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        if (setSelectedTickers) {
+                            setSelectedTickers(new Set());
+                        }
+                    }}
                     className="search-input"
                 />
             </div>
@@ -53,20 +58,31 @@ const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm,
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredData.map((stock, index) => (
-                            <tr key={index}>
-                                <td>{stock.ticker}</td>
-                                <td>{stock.businessModel}</td>
-                                <td className="score">{stock.fundamentalScore}</td>
-                                <td>{stock.price || '-'}</td>
-                                <td>{stock.fairValue || '-'}</td>
-                                <td className={stock.upside > 0 ? 'positive' : 'negative'}>
-                                    {stock.upside}%
-                                </td>
-                                <td>{stock.latestDividendYield || '-'}</td>
-                                <td>{stock.liquidityScore !== null && !isNaN(stock.liquidityScore) ? stock.liquidityScore : '-'}</td>
-                            </tr>
-                        ))}
+                        {filteredData.map((stock, index) => {
+                            const isSelected = selectedTickers.has(stock.ticker);
+                            return (
+                                <tr 
+                                    key={index}
+                                    onClick={() => {
+                                        if (toggleTickerSelection) {
+                                            toggleTickerSelection(stock.ticker);
+                                        }
+                                    }}
+                                    className={isSelected ? 'highlight-row' : ''}
+                                >
+                                    <td>{stock.ticker}</td>
+                                    <td>{stock.businessModel}</td>
+                                    <td className="score">{stock.fundamentalScore}</td>
+                                    <td>{stock.price || '-'}</td>
+                                    <td>{stock.fairValue || '-'}</td>
+                                    <td className={stock.upside > 0 ? 'positive' : 'negative'}>
+                                        {stock.upside}%
+                                    </td>
+                                    <td>{stock.latestDividendYield || '-'}</td>
+                                    <td>{stock.liquidityScore !== null && !isNaN(stock.liquidityScore) ? stock.liquidityScore : '-'}</td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

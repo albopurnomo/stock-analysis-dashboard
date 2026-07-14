@@ -244,8 +244,16 @@ html, body {
     color: var(--accent-color);
 }
 
-.highlight-row {
-    background: rgba(56, 189, 248, 0.1);
+.stock-table tbody tr {
+    cursor: pointer;
+}
+
+.stock-table tr.highlight-row {
+    background: rgba(56, 189, 248, 0.15) !important;
+}
+
+.stock-table tr.highlight-row:hover {
+    background: rgba(56, 189, 248, 0.2) !important;
 }
 
 /* Category Detail View */
