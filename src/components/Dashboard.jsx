@@ -221,7 +221,8 @@ const Dashboard = () => {
                 <section className="category-detail-section animate-fade-in">
                     <CategoryDetailPage 
                         categoryName={selectedCategory}
-                        categoryTickers={categories[selectedCategory]}
+                        categoryTickers={categories[selectedCategory]?.tickers || []}
+                        categoryDescription={categories[selectedCategory]?.description || ''}
                         allStocks={data}
                         onBack={() => setPage('categories')}
                     />

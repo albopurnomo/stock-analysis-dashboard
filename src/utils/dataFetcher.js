@@ -148,12 +148,15 @@ export const fetchCategoryData = async () => {
                     }
                     
                     const headers = results.data[catRowIndex];
+                    const descRow = catRowIndex > 0 ? results.data[catRowIndex - 1] : null;
                     const categoriesData = {};
                     
                     // headers index 0 might be empty or a label. We process each column starting from index 1.
                     for (let col = 1; col < headers.length; col++) {
                         const categoryName = headers[col]?.toString().trim();
                         if (!categoryName) continue;
+                        
+                        const description = descRow && descRow[col] ? descRow[col].toString().trim() : '';
                         
                         const tickers = [];
                         for (let row = catRowIndex + 1; row < results.data.length; row++) {
@@ -162,7 +165,10 @@ export const fetchCategoryData = async () => {
                                 tickers.push(ticker);
                             }
                         }
-                        categoriesData[categoryName] = tickers;
+                        categoriesData[categoryName] = {
+                            tickers,
+                            description
+                        };
                     }
                     
                     resolve(categoriesData);

@@ -11,7 +11,7 @@ const CategoryPage = ({ categories, onSelectCategory }) => {
             
             <div className="category-list">
                 {categoryNames.map((name) => {
-                    const count = categories[name]?.length || 0;
+                    const count = categories[name]?.tickers?.length || 0;
                     return (
                         <div 
                             key={name} 

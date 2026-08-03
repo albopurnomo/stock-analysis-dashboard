@@ -1,13 +1,13 @@
 import React from 'react';
 import StockTable from './StockTable';
 
-const CategoryDetailPage = ({ categoryName, categoryTickers, allStocks, onBack }) => {
+const CategoryDetailPage = ({ categoryName, categoryTickers, categoryDescription, allStocks, onBack }) => {
     const upperTickers = (categoryTickers || []).map(t => t.toUpperCase());
     
-    // Filter stocks that are in this category
-    const filteredStocks = allStocks.filter(stock => 
-        stock.ticker && upperTickers.includes(stock.ticker.toUpperCase())
-    );
+    // Filter stocks that are in this category, preserving the sequence from the google sheet
+    const filteredStocks = upperTickers
+        .map(ticker => allStocks.find(stock => stock.ticker && stock.ticker.toUpperCase() === ticker))
+        .filter(Boolean);
 
     return (
         <div className="category-detail-page">
@@ -15,15 +15,16 @@ const CategoryDetailPage = ({ categoryName, categoryTickers, allStocks, onBack }
                 <button className="back-btn" onClick={onBack}>
                     ← Back to Categories
                 </button>
-                <div className="detail-title-section">
-                    <h2>{categoryName}</h2>
-                    <p className="subtitle">Displaying stocks in the "{categoryName}" category</p>
-                </div>
             </div>
             
             <div className="table-section">
                 {filteredStocks.length > 0 ? (
-                    <StockTable data={filteredStocks} />
+                    <StockTable 
+                        data={filteredStocks} 
+                        showRowNumbers={true} 
+                        title={categoryName}
+                        description={categoryDescription}
+                    />
                 ) : (
                     <div className="no-data-alert">
                         <p>No stock details found for the tickers in this category.</p>

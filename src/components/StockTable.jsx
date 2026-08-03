@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm, setSearchTerm: propSetSearchTerm, selectedTickers = new Set(), setSelectedTickers = null, toggleTickerSelection = null }) => {
+const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm, setSearchTerm: propSetSearchTerm, selectedTickers = new Set(), setSelectedTickers = null, toggleTickerSelection = null, showRowNumbers = false, title = 'Stock List', description = null }) => {
     const [localSearchTerm, localSetSearchTerm] = useState('');
 
     const isControlled = propSearchTerm !== undefined && propSetSearchTerm !== undefined;
@@ -29,24 +29,54 @@ const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm,
     return (
         <div className="table-container">
             <div className="table-header">
-                <h2>Stock List</h2>
-                <input
-                    type="text"
-                    placeholder="Search ticker or business model..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        if (setSelectedTickers) {
-                            setSelectedTickers(new Set());
-                        }
-                    }}
-                    className="search-input"
-                />
+                <div className="table-title-group">
+                    <div className="table-title-row">
+                        <h2>{title}</h2>
+                        {setSelectedTickers && selectedTickers.size > 0 && (
+                            <button 
+                                className="clear-selection-btn"
+                                onClick={() => setSelectedTickers(new Set())}
+                            >
+                                Clear Selection
+                            </button>
+                        )}
+                    </div>
+                    {description && <p className="table-subtitle">{description}</p>}
+                </div>
+                <div className="search-wrapper">
+                    <input
+                        type="text"
+                        placeholder="Search ticker or business model..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            if (setSelectedTickers) {
+                                setSelectedTickers(new Set());
+                            }
+                        }}
+                        className="search-input"
+                    />
+                    {searchTerm && (
+                        <button 
+                            className="search-clear-btn"
+                            onClick={() => {
+                                setSearchTerm('');
+                                if (setSelectedTickers) {
+                                    setSelectedTickers(new Set());
+                                }
+                            }}
+                            aria-label="Clear search"
+                        >
+                            &times;
+                        </button>
+                    )}
+                </div>
             </div>
             <div className="table-wrapper">
                 <table className="stock-table">
                     <thead>
                         <tr>
+                            {showRowNumbers && <th className="row-number-col">No.</th>}
                             <th>Ticker</th>
                             <th>Business Model</th>
                             <th>F-Score</th>
@@ -70,8 +100,9 @@ const StockTable = ({ data, selectedQuadrant = null, searchTerm: propSearchTerm,
                                     }}
                                     className={isSelected ? 'highlight-row' : ''}
                                 >
+                                    {showRowNumbers && <td className="row-number-cell">{index + 1}</td>}
                                     <td>{stock.ticker}</td>
-                                    <td>{stock.businessModel}</td>
+                                    <td className="business-model-cell">{stock.businessModel}</td>
                                     <td className="score">{stock.fundamentalScore}</td>
                                     <td>{stock.price || '-'}</td>
                                     <td>{stock.fairValue || '-'}</td>
