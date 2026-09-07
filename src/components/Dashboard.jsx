@@ -4,7 +4,6 @@ import ScatterChart from './ScatterChart';
 import StockTable from './StockTable';
 import CategoryPage from './CategoryPage';
 import CategoryDetailPage from './CategoryDetailPage';
-import ClassPage from './ClassPage';
 
 const Dashboard = () => {
     const [data, setData] = useState([]);
@@ -167,12 +166,6 @@ const Dashboard = () => {
                     >
                         Category
                     </button>
-                    <button 
-                        className={`nav-tab ${page === 'class' ? 'active' : ''}`}
-                        onClick={() => setPage('class')}
-                    >
-                        Class
-                    </button>
                 </nav>
 
                 <div className="header-user">
@@ -233,12 +226,6 @@ const Dashboard = () => {
                         allStocks={data}
                         onBack={() => setPage('categories')}
                     />
-                </section>
-            )}
-
-            {page === 'class' && (
-                <section className="class-section animate-fade-in">
-                    <ClassPage />
                 </section>
             )}
         </div>
