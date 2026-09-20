@@ -36,6 +36,54 @@ const Dashboard = () => {
     }, [selectedQuadrant]);
 
     useEffect(() => {
+        if (selectedTickers.size === 0) return;
+
+        const handleGlobalClick = (e) => {
+            // If user clicked on the window vertical scrollbar, ignore
+            if (e.clientX >= document.documentElement.clientWidth) {
+                return;
+            }
+
+            const target = e.target.nodeType === 3 ? e.target.parentElement : e.target;
+            if (!target || !target.closest) return;
+
+            // Preserve selection when clicking on chart dots
+            if (target.closest('.recharts-scatter-symbol, .recharts-symbols')) {
+                return;
+            }
+
+            // Preserve selection when clicking on stock table rows
+            if (target.closest('.stock-table tbody tr')) {
+                return;
+            }
+
+            // Preserve selection when clicking within search input wrapper
+            if (target.closest('.search-wrapper')) {
+                return;
+            }
+
+            // Preserve selection when interacting with the table scrollbar
+            const tableWrapper = target.closest('.table-wrapper');
+            if (tableWrapper) {
+                const rect = tableWrapper.getBoundingClientRect();
+                const isVerticalScrollbar = tableWrapper.scrollHeight > tableWrapper.clientHeight && e.clientX >= rect.right - 16;
+                const isHorizontalScrollbar = tableWrapper.scrollWidth > tableWrapper.clientWidth && e.clientY >= rect.bottom - 16;
+                if (isVerticalScrollbar || isHorizontalScrollbar) {
+                    return;
+                }
+            }
+
+            // Clicking on empty space in the table, empty space in the chart, or outside resets the selection
+            setSelectedTickers(new Set());
+        };
+
+        document.addEventListener('click', handleGlobalClick);
+        return () => {
+            document.removeEventListener('click', handleGlobalClick);
+        };
+    }, [selectedTickers]);
+
+    useEffect(() => {
         const validate = async () => {
             const params = new URLSearchParams(window.location.search);
             const email = params.get('email');
